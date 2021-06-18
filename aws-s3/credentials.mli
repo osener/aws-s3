@@ -24,13 +24,6 @@ module Make(Io : Types.Io) : sig
 
   end
 
-  module Local : sig
-    (** Load credentials from ~/.aws/credentials (file format compatible
-        with botocore). *)
-    val get_credentials :
-      ?profile:string -> unit -> t Deferred.Or_error.t
-  end
-
   module Helper : sig
 
     (** Get credentials locally or though IAM service.
