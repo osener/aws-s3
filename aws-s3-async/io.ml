@@ -25,7 +25,7 @@ module Deferred = struct
     | Error exn -> return (Error exn)
 
   let return = Async_kernel.return
-  let after delay = Async_kernel.after (Core_kernel.Time_ns.Span.of_sec delay)
+  let after delay = Async_kernel.after (Core.Time_ns.Span.of_sec delay)
   let catch f = Async_kernel.Monitor.try_with f
   let async = don't_wait_for
 end
@@ -66,7 +66,7 @@ module Pipe = struct
 end
 
 module Net = struct
-  let connect ?connect_timeout_ms ~inet ~host ~port ~scheme =
+  let connect ?connect_timeout_ms ~inet ~host ~port ~scheme () =
     let uri =
       let scheme = match scheme with
         | `Http -> "http"
@@ -80,7 +80,7 @@ module Net = struct
           | `V4 -> PF_INET
           | `V6 -> PF_INET6
       in
-      Core.Unix.[AI_FAMILY domain]
+      Core_unix.[AI_FAMILY domain]
     in
     let close_socket_no_error = function
       | Conduit_async.V3.Inet_sock socket -> try Socket.shutdown socket `Both; with _ -> ()

@@ -33,10 +33,20 @@ module Make(Io : Types.Io) : sig
     last_modified : float; (** Seconds since epoch *)
     key : string;
     etag : etag; (** Etag as a string. this us usually the MD5, unless the object was constructed by multi-upload *)
+    meta_headers: (string * string) list option; (** Meta headers. If None, the information was not retrieved. *)
+
   }
 
   type nonrec 'a result = ('a, error) result Deferred.t
-  type 'a command = ?credentials:Credentials.t -> ?connect_timeout_ms:int -> endpoint:Region.endpoint -> 'a
+
+  (** The type of S3 requests. [credentials] refers to AWS
+     credentials, as created by [Credentials.make].
+     [connect_timeout_ms] specifies the request timeout, in
+     milliseconds. If [confirm_requester_pays], caller acknowledges
+     that it will pay AWS data transfer costs, should the target
+     bucket be so configured. [endpoint] encapsulates the AWS
+     endpoint, as created by [Region.endpoint]. *)
+  type 'a command = ?credentials:Credentials.t -> ?connect_timeout_ms:int -> ?confirm_requester_pays:bool -> endpoint:Region.endpoint -> 'a
 
   module Ls : sig
     type t = (content list * cont) result
@@ -68,6 +78,10 @@ module Make(Io : Types.Io) : sig
       status has been received from the server. This incurs a delay
       in transfer, but avoid sending a large body, if the request can be
       know to fail before the body is sent.
+      @param meta_headers Can be used to set User-defined object metadata.
+      arguments are expected to be a list of key-value pairs, the keys will be
+      prefixed with "x-amz-meta-".
+      @see https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html#UserMetadata
   *)
   val put :
     (?content_type:string ->
@@ -75,6 +89,7 @@ module Make(Io : Types.Io) : sig
      ?acl:string ->
      ?cache_control:string ->
      ?expect:bool ->
+     ?meta_headers:(string * string) list ->
      bucket:string ->
      key:string ->
      data:string -> unit -> etag result) command
@@ -143,6 +158,7 @@ module Make(Io : Types.Io) : sig
        ?acl:string ->
        ?cache_control:string ->
        ?expect:bool ->
+       ?meta_headers:(string * string) list ->
        bucket:string ->
        key:string ->
        data:string Io.Pipe.reader ->

@@ -7,16 +7,18 @@ dev-repo: "git+https://github.com/andersfugmann/aws-s3"
 bug-reports: "https://github.com/andersfugmann/aws-s3/issues"
 doc: "https://andersfugmann.github.io/aws-s3/"
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   ["dune" "build" "-p" name "-j" jobs]
 ]
 depends: [
-  "ocaml" {>= "4.05.0"}
+  "ocaml" {>= "4.08.0"}
   "dune" {>= "2.0.0"}
   "aws-s3" {= version}
-  "async_kernel" {>= "v0.9.0" }
-  "async_unix" {>= "v0.9.0" }
-  "conduit-async" {>= "1.5.0" }
+  "async_kernel" {>= "v0.9.0"}
+  "async_unix" {>= "v0.9.0"}
+  "conduit-async" {>= "4.0.0"}
+  "core" {>= "v0.14.0"}
+  "core_unix" {>= "v0.14.0"}
 ]
 synopsis: "Ocaml library for accessing Amazon S3 - Async version"
 description: """

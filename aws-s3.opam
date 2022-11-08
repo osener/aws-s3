@@ -7,19 +7,21 @@ dev-repo: "git+https://github.com/andersfugmann/aws-s3"
 bug-reports: "https://github.com/andersfugmann/aws-s3/issues"
 doc: "https://andersfugmann.github.io/aws-s3/"
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   ["dune" "build" "-p" name "-j" jobs]
   ["dune" "runtest" "-p" name "-j" jobs] {with-test}
 ]
 depends: [
-  "ocaml" {>= "4.05.0"}
+  "ocaml" {>= "4.08.0"}
   "dune" {>= "2.0.0"}
   "digestif" {>= "0.7"}
   "ptime"
   "uri"
-  "ppx_protocol_conv_xmlm" {>= "5.0.0" & < "6.0.0"}
-  "ppx_protocol_conv_json" {>= "5.0.0" & < "6.0.0"}
-  "cmdliner"
+  "ezxmlm" {>= "1.1.0"}
+  "ppx_protocol_conv_xmlm" {>= "5.0.0"}
+  "ppx_protocol_conv_json" {>= "5.0.0"}
+  "yojson"
+  "cmdliner" {>= "1.1.0"}
   "ppx_inline_test" {with-test}
   "base64" {>= "3.1.0"}
 ]

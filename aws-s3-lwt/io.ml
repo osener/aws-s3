@@ -161,7 +161,7 @@ module Net = struct
     | {ai_addr=ADDR_INET (addr, _);_} :: _ -> Deferred.Or_error.return addr
     | _ -> Deferred.Or_error.fail (failwith ("Failed to resolve host: " ^ host))
 
-  let connect ?connect_timeout_ms ~inet ~host ~port ~scheme =
+  let connect ?connect_timeout_ms ~inet ~host ~port ~scheme () =
     ignore connect_timeout_ms;
     let domain : Lwt_unix.socket_domain =
       match inet with
@@ -175,7 +175,7 @@ module Net = struct
       | `Https -> `TLS (`Hostname host, `IP addr, `Port port)
     in
     let connect () =
-      let f () = Conduit_lwt_unix.connect ~ctx:Conduit_lwt_unix.default_ctx endp in
+      let f () = Conduit_lwt_unix.connect ~ctx:(Lazy.force Conduit_lwt_unix.default_ctx) endp in
       match connect_timeout_ms with
         | Some ms -> Lwt_unix.with_timeout (float ms /. 1000.) f
         | None -> f ()
@@ -185,8 +185,9 @@ module Net = struct
     (*  Lwt_io.input_channel *)
     let reader, input = Pipe.create () in
     let buffer_size = Lwt_io.buffer_size ic in
+    let catch_result f = Lwt.catch (fun () -> Lwt_result.ok (f ())) Lwt_result.fail in
     let rec read () =
-      Lwt_result.catch (Lwt_io.read ~count:buffer_size ic) >>= fun data ->
+      catch_result (fun () -> Lwt_io.read ~count:buffer_size ic) >>= fun data ->
       match input.Pipe.closed, data with
       | _, Ok ""
       | _, Error _ ->
@@ -199,7 +200,8 @@ module Net = struct
         read ()
     in
     (* We close input and output when input is closed *)
-    Lwt.async (fun () -> Pipe.closed reader >>= fun () -> Lwt_io.close oc);
+    Lwt.async (fun () -> Pipe.closed reader >>= fun () ->
+                Lwt_io.close oc >>= fun () -> Lwt_io.close ic);
     Lwt.async read;
 
     let output, writer = Pipe.create () in

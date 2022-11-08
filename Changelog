@@ -1,12 +1,29 @@
 -*- mode: fundamental -*-
 
-[ ] Support bigstring (zero copy)
-
-4.6.0: Unreleased
-[x]: Added Backblaze vendor region (thanks @roddyyaga)
+[ ]: Support bigstring (zero copy)
 [ ]: Add support for fetching credentials from environment
-[ ]: Support session tokens
+
+4.8.1: Unreleased
+[x]: Forward compatibility with Lwt release 5.7/6.0
+[x]: Fix bug causing a leak in filedescriptors (thanks @quernd)
+
+4.8.0: Released 2022-09-04
+[x]: Add short lived credentials tokens through X-Amz-Security-Token http header (Thanks @ anuragsoni)
+[x]: Update dependencies on yojson (Thanks @Leonidas-from-XIV)
+
+4.7.0: Released 2022-04-19
+[x]: Add option ` confirm_requester_pays` (thanks @barko)
+[x]: Relax constraint on core (thanks @AndreasDahl)
+
+4.6.0: Released 2022-04-06
+[x]: Added Backblaze vendor region (thanks @roddyyaga)
 [x]: Use xmlm instead of xml_light
+[x]: Fix compilation warning on 4.12.0
+[x]: Update dependencies to latest version of core and cmdliner
+[x]: Add option to add user-supplied headers on object put (thanks @AndreasDahl)
+[x]: Adding support to specify minio address for cli
+[x]: Enable CI tests against minio-server
+[x]: extend head request to return user defined metadata headers
 
 4.5.1: Released 2020-03-31
 [x]: Allow compilation with core/async 0.13
